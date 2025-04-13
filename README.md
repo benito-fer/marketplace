@@ -56,3 +56,60 @@ Esta plataforma no incluye un sistema de pagos integrado, sino que actúa como u
 | `/database`   | Scripts de creación de base de datos MySQL y diagrama entidad-relación (ER).   |
 | `/docker`     | Archivos de configuración para contenerización y despliegue con Docker.        |
 | `/docs`       | Documentación técnica, funcional y manual de usuario.                          |
+
+
+---
+
+## 🧪 Pruebas realizadas
+
+- Pruebas unitarias en funciones clave de Laravel.
+- Pruebas de integración entre backend y frontend.
+- Validaciones de formularios y flujos de usuario.
+- Pruebas de carga con hasta 50 usuarios simultáneos en entorno local.
+- Pruebas de usabilidad en dispositivos móviles.
+
+---
+
+## 🚀 Despliegue
+
+Puedes desplegar este proyecto de forma local o en la nube:
+
+### Despliegue local con Docker
+
+```bash
+docker-compose up --build
+🧠 Mejores prácticas aplicadas
+Arquitectura MVC.
+
+Control de versiones con Git y GitHub.
+
+Contención con Docker.
+
+Validaciones en cliente y servidor.
+
+Seguridad con HTTPS y gestión de roles.
+
+Cumplimiento de estándares de accesibilidad WCAG 2.1.
+
+👤 Autor
+Benito Fernández Mendoza
+
+📚 2º DAM - Módulo Proyecto Integrado
+
+✉️ Contacto: GitHub BenitoFer
+
+📄 Licencia
+Este proyecto se desarrolla con multas educativas y no incluye pagos reales. Puede adaptarse bajo licencia MIT para entornos reales.
+
+📚 Referencias
+Laravel
+
+React.js
+
+API de OpenWeatherMap
+
+API de Google Calendar
+
+Estibador
+
+Documentación de GitHub

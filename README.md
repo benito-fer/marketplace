@@ -62,7 +62,7 @@ El objetivo principal de Marketplace Álora es digitalizar el comercio local, vi
 ## 🙋 Autor del proyecto
 
 Desarrollado por: Beni Fernández
-Contacto: bntFM1977@hotmail.com
+Contacto: ferrobenito28@hotmail.com
 Ubicación: Álora, Málaga – España
 
 ## 📄 Licencia

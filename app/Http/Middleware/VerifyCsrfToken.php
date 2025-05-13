@@ -7,12 +7,11 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 class VerifyCsrfToken extends Middleware
 {
     /**
-     * Las URIs que deberían ser excluidas de la verificación CSRF.
+     * The URIs that should be excluded from CSRF verification.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $except = [
-        'registro',
-        'login'
+        // Ninguna ruta debe estar aquí para login/register
     ];
 }

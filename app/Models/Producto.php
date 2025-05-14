@@ -3,19 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-<<<<<<< HEAD
-
-class Producto extends Model
-{
-    //
-}
-=======
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Producto extends Model
 {
     use HasFactory;
 
+    /**
+     * Los atributos que se pueden asignar masivamente.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'nombre',
         'descripcion',
@@ -26,19 +24,33 @@ class Producto extends Model
         'user_id',
     ];
 
+    /**
+     * Relación con el modelo User.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Relación con el modelo Categoria.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
     }
 
+    /**
+     * Relación con el modelo Contacto.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function contacto()
     {
-        return $this->hasOne(\App\Models\Contacto::class);
+        return $this->hasOne(Contacto::class);
     }
 }
->>>>>>> master

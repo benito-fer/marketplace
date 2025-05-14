@@ -4,83 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-<<<<<<< HEAD
-
-class ProductoController extends Controller
-{
-    /**
-     * Devuelve un listado de productos con su comerciante y categoría.
-     */
-    public function index()
-    {
-        $productos = DB::table('productos')
-            ->join('usuarios', 'productos.id_comerciante', '=', 'usuarios.id')
-            ->join('categorias', 'productos.id_categoria', '=', 'categorias.id')
-            ->select(
-                'productos.id',
-                'productos.nombre',
-                'productos.descripcion',
-                'productos.precio',
-                'productos.imagen_url',
-                'usuarios.nombre as comerciante',
-                'categorias.nombre as categoria'
-            )
-            ->get();
-
-        return response()->json($productos);
-    }
-    public function show($id)
-{
-    $producto = DB::table('productos')
-        ->join('usuarios', 'productos.id_comerciante', '=', 'usuarios.id')
-        ->join('categorias', 'productos.id_categoria', '=', 'categorias.id')
-        ->select(
-            'productos.id',
-            'productos.nombre',
-            'productos.descripcion',
-            'productos.precio',
-            'productos.imagen_url',
-            'usuarios.nombre as comerciante',
-            'categorias.nombre as categoria'
-        )
-        ->where('productos.id', $id)
-        ->first();
-
-    if (!$producto) {
-        return response()->json(['mensaje' => 'Producto no encontrado'], 404);
-    }
-
-    return response()->json($producto);
-}
-public function porCategoria($id)
-{
-    $productos = DB::table('productos')
-        ->join('usuarios', 'productos.id_comerciante', '=', 'usuarios.id')
-        ->join('categorias', 'productos.id_categoria', '=', 'categorias.id')
-        ->select(
-            'productos.id',
-            'productos.nombre',
-            'productos.descripcion',
-            'productos.precio',
-            'productos.imagen_url',
-            'usuarios.nombre as comerciante',
-            'categorias.nombre as categoria'
-        )
-        ->where('productos.id_categoria', $id)
-        ->get();
-
-    return response()->json($productos);
-}
-
-}
-
-=======
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\Producto;
 use App\Models\Categoria;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Log;
 use Exception;
 
 class ProductoController extends Controller
@@ -120,16 +49,16 @@ class ProductoController extends Controller
                 return redirect()->route('home')->with('error', 'No tienes permiso para crear productos.');
             }
 
-        $validatedData = $request->validate([
+            $validatedData = $request->validate([
                 'nombre' => 'required|string|max:255',
                 'descripcion' => 'required|string',
-            'precio' => 'required|numeric|min:0',
+                'precio' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:0',
                 'categoria_id' => 'required|exists:categorias,id',
                 'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'telefono' => 'required|string|max:255',
                 'email_contacto' => 'required|email|max:255',
-        ]);
+            ]);
 
             $producto = new Producto($validatedData);
             $producto->user_id = Auth::id();
@@ -139,15 +68,15 @@ class ProductoController extends Controller
                     $imagen = $request->file('imagen');
                     $nombreImagen = time() . '_' . uniqid() . '.' . $imagen->getClientOriginalExtension();
                     $rutaImagen = 'img/productos/' . $nombreImagen;
-                    
+
                     // Asegurarse de que el directorio existe
                     if (!file_exists(public_path('img/productos'))) {
                         mkdir(public_path('img/productos'), 0755, true);
                     }
-                    
+
                     // Mover la imagen
                     $imagen->move(public_path('img/productos'), $nombreImagen);
-                    
+
                     // Verificar que la imagen se movió correctamente
                     if (file_exists(public_path($rutaImagen))) {
                         $producto->imagen = $rutaImagen;
@@ -162,7 +91,7 @@ class ProductoController extends Controller
                 }
             }
 
-        $producto->save();
+            $producto->save();
             \Log::info('Antes de guardar contacto', [
                 'producto_id' => $producto->id,
                 'telefono' => $request->input('telefono'),
@@ -210,10 +139,10 @@ class ProductoController extends Controller
                 return redirect()->route('home')->with('error', 'No tienes permiso para editar este producto.');
             }
 
-        $validatedData = $request->validate([
+            $validatedData = $request->validate([
                 'nombre' => 'required|string|max:255',
                 'descripcion' => 'required|string',
-            'precio' => 'required|numeric|min:0',
+                'precio' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:0',
                 'categoria_id' => 'required|exists:categorias,id',
                 'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -234,7 +163,7 @@ class ProductoController extends Controller
             }
 
             // Actualizar producto
-        $producto->update($validatedData);
+            $producto->update($validatedData);
 
             \Log::info('Antes de guardar contacto (update)', [
                 'producto_id' => $producto->id,
@@ -261,9 +190,10 @@ class ProductoController extends Controller
         }
     }
 
-    public function destroy(Producto $producto): \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+    public function destroy(Producto $producto): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         try {
+            // Verificar permisos
             if (Auth::user()->rol !== 'comerciante' || $producto->user_id !== Auth::id()) {
                 $mensaje = 'No tienes permiso para eliminar este producto.';
                 if (request()->wantsJson()) {
@@ -274,31 +204,79 @@ class ProductoController extends Controller
 
             // Eliminar imagen si existe
             if ($producto->imagen && file_exists(public_path($producto->imagen))) {
-                unlink(public_path($producto->imagen));
+                if (!unlink(public_path($producto->imagen))) {
+                    Log::warning('No se pudo eliminar la imagen del producto: ' . $producto->imagen);
+                }
             }
 
-        $producto->delete();
+            // Eliminar el producto
+            $producto->delete();
 
+            // Respuesta según el tipo de solicitud
             if (request()->wantsJson()) {
                 return response()->json(['success' => true, 'message' => 'Producto eliminado correctamente.']);
             }
 
             return redirect()->route('dashboard')->with('success', 'Producto eliminado exitosamente.');
         } catch (Exception $e) {
-            \Log::error('Error al eliminar producto: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error al eliminar producto: ' . $e->getMessage(), ['exception' => $e]);
+
             if (request()->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'Error al eliminar el producto.'], 500);
             }
+
             return redirect()->back()->with('error', 'Error al eliminar el producto. Por favor, intente nuevamente.');
-    }
+        }
     }
 
-    public function porCategoria($id)
+    public function porCategoria($id): View
     {
-        $categoria = Categoria::findOrFail($id);
-        $productos = Producto::where('categoria_id', $id)->with(['categoria', 'user', 'contacto'])->get();
-        $categorias = Categoria::all();
-        return view('productos.por_categoria', compact('categoria', 'productos', 'categorias'));
+        try {
+            // Validar que la categoría exista
+            $categoria = Categoria::findOrFail($id);
+
+            // Obtener productos relacionados
+            $productos = Producto::where('categoria_id', $id)
+                ->with(['categoria', 'user', 'contacto'])
+                ->get();
+
+            // Obtener todas las categorías para el menú
+            $categorias = Categoria::all();
+
+            return view('productos.por_categoria', compact('categoria', 'productos', 'categorias'));
+        } catch (Exception $e) {
+            Log::error('Error al obtener productos por categoría: ' . $e->getMessage(), ['exception' => $e]);
+            abort(500, 'Error al cargar los productos de la categoría.');
+        }
+    }
+    
+    /**
+     * Mostrar todas las categorías disponibles
+     */
+    public function todasCategorias(): View
+    {
+        try {
+            $categorias = Categoria::all();
+            return view('productos.categorias', compact('categorias'));
+        } catch (Exception $e) {
+            Log::error('Error al obtener todas las categorías: ' . $e->getMessage(), ['exception' => $e]);
+            abort(500, 'Error al cargar las categorías.');
+        }
+    }
+    
+    /**
+     * Mostrar los productos más vistos/destacados
+     */
+    public function productosMasVistos(): View
+    {
+        try {
+            // Aquí podrías implementar lógica para mostrar los más vistos
+            // Por ahora simplemente mostraremos todos los productos
+            $productos = Producto::with(['categoria', 'user', 'contacto'])->get();
+            return view('productos.mas_vistos', compact('productos'));
+        } catch (Exception $e) {
+            Log::error('Error al obtener productos más vistos: ' . $e->getMessage(), ['exception' => $e]);
+            abort(500, 'Error al cargar los productos destacados.');
+        }
     }
 }
->>>>>>> master

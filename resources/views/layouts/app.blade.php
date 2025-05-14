@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Marketplace Álora')</title>
     <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div id="notificacion" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);z-index:9999;min-width:300px;max-width:90vw;padding:16px 24px;border-radius:8px;font-size:1.1rem;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.15);"></div>
@@ -15,8 +16,8 @@
     </header>
     <nav>
         <a class="nav-link" href="{{ route('home') }}">Inicio</a>
-        <a class="nav-link" href="{{ route('home') }}#productos">Productos</a>
-        <a class="nav-link" href="{{ route('home') }}#categorias">Categorías</a>
+        <a class="nav-link" href="{{ route('productos.mas_vistos') }}">Productos</a>
+        <a class="nav-link" href="{{ route('categorias.todas') }}">Categorías</a>
         @auth
             <a class="nav-link" href="{{ route('perfil') }}">Mi Perfil</a>
             @if(Auth::user()->rol === 'comerciante')
@@ -29,8 +30,8 @@
                 @csrf
             </form>
         @else
-            <a class="nav-link" href="{{ route('home') }}#login">Iniciar sesión</a>
-            <a class="nav-link" href="{{ route('home') }}#registro">Registrarse</a>
+            <a class="nav-link" href="{{ route('login') }}">Iniciar sesión</a>
+            <a class="nav-link" href="{{ route('register') }}">Registrarse</a>
         @endauth
     </nav>
     <div class="main-layout">
@@ -77,12 +78,8 @@
             });
         }
     });
-
-    // Redirigir a la home si el usuario accede a /login o /register directamente
-    if (window.location.pathname === '/login' || window.location.pathname === '/register') {
-        window.location.href = '/';
-    }
     </script>
+    <script src="/js/notificaciones.js"></script>
     <script>
     function renderAlmanaque() {
         const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -114,4 +111,4 @@
     document.addEventListener('DOMContentLoaded', renderAlmanaque);
     </script>
 </body>
-</html> 
+</html>

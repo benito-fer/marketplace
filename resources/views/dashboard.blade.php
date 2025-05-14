@@ -65,8 +65,10 @@
                             </div>
                             <div class="flip-card-back">
                                 <h4>Acciones</h4>
-                                <a href="{{ route('productos.edit', $producto->id) }}" class="btn btn-warning">Modificar</a>
-                                <button class="btn btn-danger btn-eliminar-producto" data-id="{{ $producto->id }}">Eliminar</button>
+                                <div class="acciones-botones">
+                                    <a href="{{ route('productos.edit', $producto->id) }}" class="acciones-btn modificar">Modificar</a>
+                                    <button class="acciones-btn eliminar btn-eliminar-producto" data-id="{{ $producto->id }}">Eliminar</button>
+                                </div>
                             </div>
                         </div>
                     </div>

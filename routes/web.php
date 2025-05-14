@@ -1,60 +1,29 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-<<<<<<< HEAD
-use App\Http\Controllers\AuthController;
-
-use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\CategoriaController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-
-// Rutas públicas
-Route::get('/', function () {
-    return view('index');
-})->name('home');
-Route::post('/logout', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return response()->json(['success' => true, 'message' => 'Sesión cerrada']);
-
-})->name('logout');
-
-
-// Autenticación
-Route::post('/registro', [AuthController::class, 'register'])->name('register');
-Route::post('/login', [AuthController::class, 'login'])->name('login');
-
-
-// Rutas de productos
-Route::get('/productos', [ProductoController::class, 'index']);
-Route::get('/categorias', [CategoriaController::class, 'index']);
-Route::get('/producto/{id}', [ProductoController::class, 'show']);
-Route::get('/productos/categoria/{id}', [ProductoController::class, 'porCategoria']);
-
-// Dashboard protegido
-Route::get('/dashboard', function () {
-    return 'Bienvenido al dashboard';
-})->middleware(['auth', 'verified']);
-=======
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\AuthController;
 
-// Rutas de autenticación
+// Rutas de autenticación para invitados
 Route::middleware('guest')->group(function () {
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 });
 
 // Ruta de login (POST) fuera del grupo guest
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
 // Ruta de cierre de sesión
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Página principal
 Route::get('/', [ProductoController::class, 'index'])->name('home');
+
+// Rutas de productos y categorías
+Route::get('/productos/mas-vistos', [ProductoController::class, 'productosMasVistos'])->name('productos.mas_vistos');
+Route::get('/categorias', [ProductoController::class, 'todasCategorias'])->name('categorias.todas');
+Route::get('/categoria/{id}', [ProductoController::class, 'porCategoria'])->name('categoria.productos');
 
 // Rutas protegidas para comerciantes
 Route::middleware(['auth', 'comerciante'])->group(function () {
@@ -66,13 +35,9 @@ Route::middleware(['auth', 'comerciante'])->group(function () {
     Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
 });
 
-// Ruta para mostrar productos por categoría
-Route::get('/categoria/{id}', [ProductoController::class, 'porCategoria'])->name('categoria.productos');
-
 // Perfil de usuario (solo autenticados)
 Route::middleware(['auth'])->group(function () {
     Route::get('/perfil', [AuthController::class, 'perfil'])->name('perfil');
     Route::post('/perfil', [AuthController::class, 'actualizarPerfil'])->name('perfil.actualizar');
 });
 
->>>>>>> master

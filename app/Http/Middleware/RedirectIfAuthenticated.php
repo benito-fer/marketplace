@@ -17,15 +17,19 @@ class RedirectIfAuthenticated
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 $user = Auth::guard($guard)->user();
-                
+
+                // Redirigir según el rol del usuario autenticado
                 if ($user->rol === 'comerciante') {
                     return redirect()->route('dashboard');
+                } elseif ($user->rol === 'cliente') {
+                    return redirect()->route('home');
                 }
-                
-                return redirect()->route('home');
+
+                // Redirigir a una ruta predeterminada si el rol no coincide
+                return redirect(RouteServiceProvider::HOME);
             }
         }
 
         return $next($request);
     }
-} 
+}

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 
 namespace App\Http;
@@ -12,7 +11,11 @@ class Kernel extends HttpKernel
      */
     protected $middleware = [
         // Otros middlewares...
-        \App\Http\Middleware\CorsMiddleware::class,
+        \App\Http\Middleware\CorsMiddleware::class, // Middleware para manejar CORS
+        \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class, // Verificar modo de mantenimiento
+        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class, // Validar tamaño de las solicitudes POST
+        \App\Http\Middleware\TrimStrings::class, // Eliminar espacios en cadenas
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class, // Convertir cadenas vacías a null
     ];
 
     /**
@@ -20,56 +23,31 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            \App\Http\Middleware\VerifyCsrfToken::class,
-            // otros middlewares del grupo web...
+            \App\Http\Middleware\EncryptCookies::class, // Encriptar cookies
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class, // Agregar cookies a la respuesta
+            \Illuminate\Session\Middleware\StartSession::class, // Iniciar sesión
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class, // Compartir errores desde la sesión
+            \App\Http\Middleware\VerifyCsrfToken::class, // Verificar CSRF
+            \Illuminate\Routing\Middleware\SubstituteBindings::class, // Sustituir enlaces de rutas
         ],
 
         'api' => [
-            // middleware del grupo api...
+            'throttle:api', // Limitar solicitudes API
+            \Illuminate\Routing\Middleware\SubstituteBindings::class, // Sustituir enlaces de rutas
         ],
-    ];
-}
-=======
-<?php
-
-namespace App\Http;
-
-use Illuminate\Foundation\Http\Kernel as HttpKernel;
-
-class Kernel extends HttpKernel
-{
-    /**
-     * Middleware global
-     */
-    protected $middleware = [
-        // Otros middlewares...
-        \App\Http\Middleware\CorsMiddleware::class,
     ];
 
     /**
-     * Middleware agrupados
+     * Middleware de rutas individuales
      */
-    protected $middlewareGroups = [
-        'web' => [
-            \App\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class, // Add this
-            // otros middlewares del grupo web...
-        ],
-
-        'api' => [
-            'throttle:api', // Consider adding this
-            \Illuminate\Routing\Middleware\SubstituteBindings::class, // And this
-        ],
-    ];
     protected $routeMiddleware = [
-        'auth' => \App\Http\Middleware\Authenticate::class, // Ensure this is present
-        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
-        'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'comerciante' => \App\Http\Middleware\CheckComerciante::class,
+        'auth' => \App\Http\Middleware\Authenticate::class, // Middleware de autenticación
+        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class, // Autenticación básica
+        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class, // Configurar encabezados de caché
+        'can' => \Illuminate\Auth\Middleware\Authorize::class, // Autorización basada en políticas
+        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class, // Redirigir si está autenticado
+        'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class, // Validar firmas de URL
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class, // Limitar solicitudes
+        'comerciante' => \App\Http\Middleware\CheckComerciante::class, // Middleware para comerciantes
     ];
 }
->>>>>>> master

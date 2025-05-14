@@ -1,22 +1,3 @@
-<<<<<<< HEAD
-<?php
-
-namespace App\Http\Middleware;
-
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
-
-class VerifyCsrfToken extends Middleware
-{
-    /**
-     * Las URIs que deberían ser excluidas de la verificación CSRF.
-     *
-     * @var array
-     */
-    protected $except = [
-        'registro',
-        'login'
-    ];
-=======
 <?php
 
 namespace App\Http\Middleware;
@@ -31,7 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        // Ninguna ruta debe estar aquí para login/register
+        // Asegúrate de no excluir rutas sensibles como login/register
+        // Solo incluir rutas específicas si es absolutamente necesario
     ];
->>>>>>> master
 }

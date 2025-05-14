@@ -10,9 +10,15 @@ class CorsMiddleware
     {
         $response = $next($request);
 
-        $response->headers->set('Access-Control-Allow-Origin', '*');
+        // Configurar los encabezados CORS
+        $response->headers->set('Access-Control-Allow-Origin', '*'); // Cambiar '*' por dominios específicos en producción
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+
+        // Manejar solicitudes OPTIONS (preflight)
+        if ($request->getMethod() === 'OPTIONS') {
+            $response->setStatusCode(200);
+        }
 
         return $response;
     }

@@ -21,11 +21,11 @@
                                 @endif
                                 <h3>{{ $producto->nombre }}</h3>
                                 <p>{{ $producto->descripcion }}</p>
-                                <p>€{{ $producto->precio }}</p>
+                                <p class="precio">€{{ number_format($producto->precio, 2) }}</p>
                             </div>
                             <div class="flip-card-back">
                                 <h4>{{ $producto->nombre }}</h4>
-                                <p><strong>Precio:</strong> €{{ $producto->precio }}</p>
+                                <p><strong>Precio:</strong> €{{ number_format($producto->precio, 2) }}</p>
                                 <p><strong>Comerciante:</strong> {{ $producto->user->name ?? '' }}</p>
                                 <p><strong>Teléfono:</strong> {{ $producto->contacto->telefono ?? '' }}</p>
                                 <p><strong>Email:</strong> {{ $producto->contacto->email_contacto ?? $producto->user->email ?? '' }}</p>

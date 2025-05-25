@@ -3902,3 +3902,5 @@ Did you mean one of these?
 [2025-05-14 10:11:46] local.INFO: Antes de guardar contacto {"producto_id":14,"telefono":"652314569","email_contacto":"beni.fernandez34@gmail.com"} 
 [2025-05-14 10:11:46] local.INFO: Después de guardar contacto {"contacto":{"App\\Models\\Contacto":{"producto_id":14,"telefono":"652314569","email_contacto":"beni.fernandez34@gmail.com","updated_at":"2025-05-14T10:11:46.000000Z","created_at":"2025-05-14T10:11:46.000000Z","id":8}}} 
 [2025-05-14 10:11:46] local.INFO: Producto creado exitosamente {"producto_id":14} 
+[2025-05-18 18:27:03] local.INFO: Antes de guardar contacto (update) {"producto_id":13,"telefono":"664522176","email_contacto":"ferrobenito28@hotmail.com"} 
+[2025-05-18 18:27:03] local.INFO: Después de guardar contacto (update) {"contacto":{"App\\Models\\Contacto":{"id":7,"producto_id":13,"telefono":"664522176","email_contacto":"ferrobenito28@hotmail.com","created_at":"2025-05-14T09:27:16.000000Z","updated_at":"2025-05-14T09:27:16.000000Z"}}} 

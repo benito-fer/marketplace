@@ -53,4 +53,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Producto::class);
     }
+
+    /**
+     * Relación con el modelo Contacto.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function contacto()
+    {
+        return $this->hasOne(Contacto::class);
+    }
 }

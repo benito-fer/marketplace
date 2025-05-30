@@ -46,8 +46,21 @@ class ProductoController extends Controller
     {
         try {
             if (Auth::user()->rol !== 'comerciante') {
+                Log::warning('Intento de creación de producto por usuario no autorizado', [
+                    'user_id' => Auth::id(),
+                    'user_email' => Auth::user()->email,
+                    'ip' => $request->ip()
+                ]);
                 return redirect()->route('home')->with('error', 'No tienes permiso para crear productos.');
             }
+
+            Log::info('Intento de creación de producto', [
+                'user_id' => Auth::id(),
+                'user_email' => Auth::user()->email,
+                'producto_nombre' => $request->nombre,
+                'categoria_id' => $request->categoria_id,
+                'ip' => $request->ip()
+            ]);
 
             $validatedData = $request->validate([
                 'nombre' => 'required|string|max:255',
@@ -64,59 +77,49 @@ class ProductoController extends Controller
             $producto->user_id = Auth::id();
 
             if ($request->hasFile('imagen')) {
-                try {
-                    $imagen = $request->file('imagen');
-                    $nombreImagen = time() . '_' . uniqid() . '.' . $imagen->getClientOriginalExtension();
-                    $rutaImagen = 'img/productos/' . $nombreImagen;
-
-                    // Asegurarse de que el directorio existe
-                    if (!file_exists(public_path('img/productos'))) {
-                        mkdir(public_path('img/productos'), 0755, true);
-                    }
-
-                    // Mover la imagen
-                    $imagen->move(public_path('img/productos'), $nombreImagen);
-
-                    // Verificar que la imagen se movió correctamente
-                    if (file_exists(public_path($rutaImagen))) {
-                        $producto->imagen = $rutaImagen;
-                        Log::info('Imagen guardada exitosamente en: ' . $rutaImagen);
-                    } else {
-                        Log::error('Error al mover la imagen: No se encontró el archivo después de moverlo');
-                        throw new Exception('Error al guardar la imagen');
-                    }
-                } catch (Exception $e) {
-                    Log::error('Error al procesar la imagen: ' . $e->getMessage());
-                    return redirect()->back()->with('error', 'Error al procesar la imagen. Por favor, intente nuevamente.');
-                }
+                $imagen = $request->file('imagen');
+                $nombreImagen = time() . '_' . $imagen->getClientOriginalName();
+                $imagen->move(public_path('images/productos'), $nombreImagen);
+                $producto->imagen = $nombreImagen;
+                
+                Log::info('Imagen de producto guardada', [
+                    'producto_id' => $producto->id,
+                    'nombre_imagen' => $nombreImagen,
+                    'tamaño' => $imagen->getSize(),
+                    'tipo' => $imagen->getMimeType()
+                ]);
             }
 
             $producto->save();
-            \Log::info('Antes de guardar contacto', [
-                'producto_id' => $producto->id,
-                'telefono' => $request->input('telefono'),
-                'email_contacto' => $request->input('email_contacto')
-            ]);
 
             $contacto = \App\Models\Contacto::updateOrCreate(
-                ['producto_id' => $producto->id],
+                ['user_id' => Auth::id()],
                 [
+                    'user_id' => Auth::id(),
                     'telefono' => $request->input('telefono'),
                     'email_contacto' => $request->input('email_contacto', Auth::user()->email)
                 ]
             );
 
-            \Log::info('Después de guardar contacto', [
-                'contacto' => $contacto
+            Log::info('Producto creado exitosamente', [
+                'producto_id' => $producto->id,
+                'nombre' => $producto->nombre,
+                'precio' => $producto->precio,
+                'stock' => $producto->stock,
+                'categoria_id' => $producto->categoria_id,
+                'user_id' => $producto->user_id,
+                'contacto_id' => $contacto->id,
+                'ip' => $request->ip()
             ]);
-
-            Log::info('Producto creado exitosamente', ['producto_id' => $producto->id]);
 
             return redirect()->route('dashboard')->with('success', 'Producto creado exitosamente.');
         } catch (Exception $e) {
-            Log::error('Error al crear producto: ' . $e->getMessage(), [
-                'exception' => $e,
-                'request_data' => $request->except(['imagen'])
+            Log::error('Error al crear producto', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'request_data' => $request->except(['imagen', 'password']),
+                'ip' => $request->ip(),
+                'trace' => $e->getTraceAsString()
             ]);
             return redirect()->back()->with('error', 'Error al crear el producto. Por favor, intente nuevamente.');
         }
@@ -172,8 +175,9 @@ class ProductoController extends Controller
             ]);
 
             $contacto = \App\Models\Contacto::updateOrCreate(
-                ['producto_id' => $producto->id],
+                ['user_id' => Auth::id()],
                 [
+                    'user_id' => Auth::id(),
                     'telefono' => $request->input('telefono'),
                     'email_contacto' => $request->input('email_contacto', Auth::user()->email)
                 ]
@@ -237,7 +241,7 @@ class ProductoController extends Controller
 
             // Obtener productos relacionados
             $productos = Producto::where('categoria_id', $id)
-                ->with(['categoria', 'user', 'contacto'])
+                ->with(['categoria', 'user'])
                 ->get();
 
             // Obtener todas las categorías para el menú
@@ -272,7 +276,7 @@ class ProductoController extends Controller
         try {
             // Aquí podrías implementar lógica para mostrar los más vistos
             // Por ahora simplemente mostraremos todos los productos
-            $productos = Producto::with(['categoria', 'user', 'contacto'])->get();
+            $productos = Producto::with(['categoria', 'user'])->get();
             return view('productos.mas_vistos', compact('productos'));
         } catch (Exception $e) {
             Log::error('Error al obtener productos más vistos: ' . $e->getMessage(), ['exception' => $e]);

@@ -15,10 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->text('descripcion')->nullable();
-<<<<<<< HEAD
             $table->string('imagen_url')->nullable();
-=======
->>>>>>> master
             $table->timestamps();
         });
     }

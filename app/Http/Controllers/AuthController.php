@@ -26,6 +26,12 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         try {
+            Log::info('Intento de registro iniciado', [
+                'email' => $request->email,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
@@ -42,14 +48,34 @@ class AuthController extends Controller
 
             Auth::login($user);
 
+            Log::info('Registro exitoso', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'rol' => $user->rol,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+
             return $this->getRedirectResponse($user, 'Registro exitoso. Redirigiendo...');
         } catch (ValidationException $e) {
+            Log::warning('Error de validación en registro', [
+                'email' => $request->email,
+                'errors' => $e->errors(),
+                'ip' => $request->ip()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'errors' => $e->errors()
             ], 422);
         } catch (Exception $e) {
-            Log::error('Error during registration: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error durante el registro', [
+                'error' => $e->getMessage(),
+                'email' => $request->email,
+                'ip' => $request->ip(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'errors' => ['general' => 'Ocurrió un error inesperado.']
@@ -60,6 +86,12 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         try {
+            Log::info('Intento de inicio de sesión', [
+                'email' => $request->email,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+
             $credentials = $request->validate([
                 'email' => 'required|email',
                 'password' => 'required',
@@ -69,15 +101,35 @@ class AuthController extends Controller
                 $request->session()->regenerate();
                 $user = Auth::user();
 
+                Log::info('Inicio de sesión exitoso', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'rol' => $user->rol,
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent()
+                ]);
+
                 return $this->getRedirectResponse($user, 'Inicio de sesión exitoso. Redirigiendo...');
             }
+
+            Log::warning('Intento de inicio de sesión fallido', [
+                'email' => $request->email,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
 
             return response()->json([
                 'success' => false,
                 'errors' => ['email' => 'Credenciales incorrectas']
             ], 401);
         } catch (Exception $e) {
-            Log::error('Error during login: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error durante el inicio de sesión', [
+                'error' => $e->getMessage(),
+                'email' => $request->email,
+                'ip' => $request->ip(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'errors' => ['general' => 'Error al iniciar sesión.']
@@ -88,6 +140,15 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         try {
+            $user = Auth::user();
+            
+            Log::info('Cierre de sesión', [
+                'user_id' => $user ? $user->id : null,
+                'email' => $user ? $user->email : null,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -97,7 +158,12 @@ class AuthController extends Controller
                 'message' => 'Sesión cerrada correctamente'
             ]);
         } catch (Exception $e) {
-            Log::error('Error during logout: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error durante el cierre de sesión', [
+                'error' => $e->getMessage(),
+                'ip' => $request->ip(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al cerrar sesión'

@@ -14,15 +14,15 @@ class Contacto extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['producto_id', 'telefono', 'email_contacto'];
+    protected $fillable = ['user_id', 'telefono', 'email_contacto'];
 
     /**
-     * Relación con el modelo Producto.
+     * Relación con el modelo User.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function producto()
+    public function user()
     {
-        return $this->belongsTo(\App\Models\Producto::class);
+        return $this->belongsTo(\App\Models\User::class);
     }
 }

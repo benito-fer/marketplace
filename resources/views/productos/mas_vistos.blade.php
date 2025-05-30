@@ -17,8 +17,8 @@
                                 <img src="{{ asset($producto->imagen) }}" alt="Imagen del producto">
                             @endif
                             <h3>{{ $producto->nombre }}</h3>
-                            <p>{{ $producto->descripcion }}</p>
                             <p class="precio">€{{ number_format($producto->precio, 2) }}</p>
+                            <p>{{ $producto->descripcion }}</p>
                         </div>
                         <div class="flip-card-back">
                             <h4>{{ $producto->nombre }}</h4>
